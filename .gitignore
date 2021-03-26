@@ -2,3 +2,6 @@ env
 dataset
 CNNSpeckleFilter.ipynb
 Sentinel_1_Speckle_Filter.ipynb
+.ipynb_checkpoints/
+__pycache__
+a.ipynb
