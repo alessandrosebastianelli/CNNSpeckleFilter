@@ -23,6 +23,9 @@ This project has been developed in Python3.6.8.
     - Windows: `env\Scripts\activate`
     - MacOS\Linux: `source env/bin/activate`
 9. Install requirements: `pip install -r requirements.txt`
+9. Dataset:
+    - A) Unzip dataset.zip in the same directory
+    - B) Create your dataset using our tool [Sentinel Data Downloader Tool](https://github.com/Sebbyraft/SentinelDataDownloaderTool)
 10. Open Jupyter Lab: `jupyter lab`
 
 
