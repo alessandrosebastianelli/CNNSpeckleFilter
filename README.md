@@ -1,8 +1,8 @@
+![](res/model.png)
 # CNNSpeckleFilter
 A speckle filter for Synthetic Aperture Radar data based on Convolutional Neural Networks
 
-![](res/model.png)
-
+**Authors**: Alessandro Sebastianelli, Maria Pia Del Rosso, Silvia Liberata Ullo
 
 ## Installation
 This project has been developed in Python3.6.8.
