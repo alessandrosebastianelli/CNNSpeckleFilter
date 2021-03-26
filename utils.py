@@ -23,13 +23,24 @@ def plot_dataset(batch_speckle, batch_clean):
 
 def plot_history(history):
     fig, ax = plt.subplots(
-        nrows = 1,
+        nrows = 2,
         ncols = 1, 
-        figsize = (10,4)
+        figsize = (15,10))
 
-    ax.plot(history.history['loss'], '-*', label='Training Loss')
-    ax.plot(history.history['val_loss'], '-.', label='Validation Loss')
-    ax.set_xlabel('Epochs')
-    ax.set_ylabel('MAE')
+    ax[0].plot(history.history['loss'], '-*', label='Training Loss')
+    ax[0].plot(history.history['val_loss'], '-o', label='Validation Loss')
+    ax[0].set_xlabel('Epochs')
+    ax[0].set_ylabel('MAE')
+    ax[0].set_title('Training VS Validation MAE')
+
+    ax[1].plot(history.history['mse'], '-*', label='Training Loss')
+    ax[1].plot(history.history['val_mse'], '-o', label='Validation Loss')
+    ax[1].set_xlabel('Epochs')
+    ax[1].set_ylabel('MSE')
+    ax[1].set_title('Training VS Validation MSE')
     
+    ax[0].legend()
+    ax[0].grid()
+    ax[1].legend()
+    ax[1].grid()
     plt.show()
