@@ -6,7 +6,7 @@ from tensorflow.keras.models import Model
 class CNNSpeckleFIlter:
 
     def __init__(self, input_shape, n_layers):
-        self.model = delf.__build_model(input_shape, n_layers)
+        self.model = self.__build_model(input_shape, n_layers)
         self.model.compile(
             loss = 'mae', 
             optimizer = Adam(lr=0.0001), 
