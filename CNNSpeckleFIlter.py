@@ -1,4 +1,5 @@
 from tensorflow.keras.layers import Input, Conv2D, Activation, BatchNormalization, Subtract
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 
@@ -39,12 +40,14 @@ class CNNSpeckleFIlter:
         return model
     
     def train_model(self, epochs, train_gen, val_gen, train_step, val_step):
+        es = EarlyStopping(monitor='val_loss', min_delta=0.01, patience=10, verbose=0, mode='auto', baseline=None, restore_best_weights=False)
         history = speckle_filter.fit(
             train_gen,
             steps_per_epoch = train_step,
             validation_data=val_gen,
             validation_steps=val_step,
             epochs = epochs,
+            callbacks=[es]
         )
 
         return history
