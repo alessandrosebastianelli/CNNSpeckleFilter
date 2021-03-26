@@ -3,3 +3,4 @@ matplotlib
 tensorflow
 rasterio
 jupyterlab
+scikit-image
