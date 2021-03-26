@@ -29,14 +29,20 @@ class DatasetHandler():
         return s1
     
     def __normalize(self, s1):
-        s1 =s1*2.0
-        minval = np.min(s1)
-        s1 = (s1 - minval)/(np.max(s1) - minval)
+        def reject_outliers_2(data, m=5):
+            d = np.abs(data - np.median(data))
+            mdev = np.median(d)
+            s = d / (mdev if mdev else 1.)
+            return data[s < m]  
+
+        d = reject_outliers_2(s1.flatten(), m=2.)
+
+        s1 = (s1 -  np.min(d))/(np.max(d) -  np.min(d))
         s1 = np.clip(s1, 0.0, 1.0)
 
         return s1.astype(np.float)
 
-    def __add_speckled(self, s1, mean = 0, sigma = 0.6):
+    def __add_speckled(self, s1, mean = 0, sigma = 0.3):
         x = np.random.normal(mean, sigma**0.5, s1.shape)
         y = np.random.normal(mean, sigma**0.5, s1.shape)
         noise = np.sqrt(x**2, y**2)
