@@ -20,6 +20,12 @@ class DatasetHandler():
                 "validation"
             ), "*")
         )
+        self.test_paths = glob.glob(
+            os.path.join(os.path.join(
+                root,
+                "testing"
+            ), "*")
+        )
 
     def __load(self, path):
         with rasterio.open(path) as src:
