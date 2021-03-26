@@ -29,9 +29,10 @@ class DatasetHandler():
         return s1
     
     def __normalize(self, s1):
+        s1 =s1*2.0
         minval = np.min(s1)
         s1 = (s1 - minval)/(np.max(s1) - minval)
-        s1 = np.clip(2*s1, 0.0, 1.0)
+        s1 = np.clip(s1, 0.0, 1.0)
 
         return s1.astype(np.float)
 
