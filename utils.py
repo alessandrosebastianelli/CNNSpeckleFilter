@@ -1,5 +1,7 @@
+from skimage.metrics import structural_similarity, peak_signal_noise_ratio
 import matplotlib.pyplot as plt
 import numpy as np
+
 
 def plot_dataset(batch_speckle, batch_clean):
     n = batch_speckle.shape[0]
@@ -50,7 +52,6 @@ def plot_history(history):
 def plot_model_results(batch_speckle, batch_clean, batch_pred):
     n = batch_speckle.shape[0]
 
-
     for i in range(n):
         fig, axes = plt.subplots(
         nrows = 2,
@@ -78,3 +79,22 @@ def plot_model_results(batch_speckle, batch_clean, batch_pred):
     
         plt.show()
         plt.close()
+
+def compute_metrics(batch_speckle, batch_clean, batch_pred):
+    n = batch_speckle.shape[0]
+    
+    print('===========================================================================================================================================')
+    print('  Test \t\t Metric\t\tGrount Truth VS Grount Truth \t\t Grount Truth VS Input \t\t Grount Truth VS Model Prediction')
+    print('-------------------------------------------------------------------------------------------------------------------------------------------')
+    for i in range(n):
+        gt_vs_gt = peak_signal_noise_ratio(batch_clean[i, ...,0], batch_clean[i, ...,0], data_range=1.0)
+        gt_vs_in  = peak_signal_noise_ratio(batch_clean[i, ...,0], batch_speckle[i,...,0], data_range=1.0)
+        gt_vs_pred  = peak_signal_noise_ratio(batch_clean[i, ...,0], batch_pred[i,...,0], data_range=1.0)
+
+        print('   %i  \t\t  PSNR \t\t             %.2f             \t\t             %.2f      \t\t             %.2f' % (i, gt_vs_gt, gt_vs_in, gt_vs_pred))
+        
+        gt_vs_gt = structural_similarity(batch_clean[i, ...,0], batch_clean[i, ...,0], data_range=1.0)
+        gt_vs_in  = structural_similarity(batch_clean[i, ...,0], batch_speckle[i,...,0], data_range=1.0)
+        gt_vs_pred  = structural_similarity(batch_clean[i, ...,0], batch_pred[i,...,0], data_range=1.0)
+        print('   %i  \t\t  PSNR \t\t             %.2f             \t\t             %.2f      \t\t             %.2f' % (i, gt_vs_gt, gt_vs_in, gt_vs_pred))
+        print('-------------------------------------------------------------------------------------------------------------------------------------------')
