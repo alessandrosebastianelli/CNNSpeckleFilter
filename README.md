@@ -13,7 +13,7 @@ This project has been developed in Python3.6.8.
 4. Navigate to Desktop
 5. Clone this project
     A. `git clone https://github.com/Sebbyraft/CNNSpeckleFilter.git`
-    B. <a href="https://github.com/Sebbyraft/CNNSpeckleFilter/archive/refs/heads/main.zip" target="_blank">Download the project</a> and unziop it on Desktop
+    B. <a href="https://github.com/Sebbyraft/CNNSpeckleFilter/archive/refs/heads/main.zip" target="_blank">Download the project</a> and unzip it on Desktop
 6. Navigate into *Desktop/CNNSpeckleFilter*
 7. Create a virtual environment: `virtualenv env`
 8. Activate the virtualenv *env*:
