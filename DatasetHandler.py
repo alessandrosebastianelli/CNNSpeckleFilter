@@ -31,11 +31,11 @@ class DatasetHandler():
     def __normalize(self, s1):
         minval = np.min(s1)
         s1 = (s1 - minval)/(np.max(s1) - minval)
-        s1 = np.clip(s1, 0.0, 1.0)
+        s1 = np.clip(2*s1, 0.0, 1.0)
 
         return s1.astype(np.float)
 
-    def __add_speckled(self, s1, mean = 0, sigma = 0.3):
+    def __add_speckled(self, s1, mean = 0, sigma = 0.6):
         x = np.random.normal(mean, sigma**0.5, s1.shape)
         y = np.random.normal(mean, sigma**0.5, s1.shape)
         noise = np.sqrt(x**2, y**2)
