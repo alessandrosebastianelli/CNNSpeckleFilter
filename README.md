@@ -24,7 +24,7 @@ This project has been developed in Python3.6.8.
     - MacOS\Linux: `source env/bin/activate`
 9. Install requirements: `pip install -r requirements.txt`
 9. Dataset:
-    - A) Unzip dataset.zip in the same directory
+    - A) Download the dataset from [here](https://github.com/Sebbyraft/sentinel_1_GRD_dataset/archive/refs/heads/main.zip) ([repository](https://github.com/Sebbyraft/sentinel_1_GRD_dataset)) and unzip dataset.zip in the same directory
     - B) Create your dataset using our tool [Sentinel Data Downloader Tool](https://github.com/Sebbyraft/SentinelDataDownloaderTool)
 10. Open Jupyter Lab: `jupyter lab`
 
