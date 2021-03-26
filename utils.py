@@ -20,3 +20,16 @@ def plot_dataset(batch_speckle, batch_clean):
         axes[2*i+1,1].set_title('Ground truth')
 
     plt.show()
+
+def plot_history(history):
+    fig, ax = plt.subplots(
+        nrows = 1,
+        ncols = 1, 
+        figsize = (10,4)
+
+    ax.plot(history.history['loss'], '-*', label='Training Loss')
+    ax.plot(history.history['val_loss'], '-.', label='Validation Loss')
+    ax.set_xlabel('Epochs')
+    ax.set_ylabel('MAE')
+    
+    plt.show()
