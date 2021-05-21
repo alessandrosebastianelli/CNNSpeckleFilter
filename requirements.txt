@@ -4,3 +4,7 @@ tensorflow
 rasterio
 jupyterlab
 scikit-image
+findpeaks
+bm3d
+torch
+opencv-python

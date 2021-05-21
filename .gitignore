@@ -2,3 +2,9 @@ env
 dataset
 .ipynb_checkpoints/
 __pycache__
+DPIR
+IDCNN
+SAR-CNN
+test
+my_graph
+other_weights
