@@ -1,4 +1,5 @@
-env
+filterenv
+filterenv2
 dataset
 .ipynb_checkpoints/
 __pycache__
@@ -8,3 +9,5 @@ SAR-CNN
 test
 my_graph
 other_weights
+speckle2void
+SAR2SAR-GRD-test
