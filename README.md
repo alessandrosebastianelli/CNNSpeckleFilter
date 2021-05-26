@@ -1,4 +1,4 @@
-![](res/model.png)
+![](res/model-v2.png)
 # CNNSpeckleFilter
 A speckle filter for Synthetic Aperture Radar data based on Convolutional Neural Networks
 
