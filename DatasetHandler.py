@@ -4,7 +4,6 @@ import random
 import glob
 import os
 
-
 class DatasetHandler():
     def __init__(self, root):
         self.train_paths = glob.glob(
