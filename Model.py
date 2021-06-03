@@ -4,7 +4,6 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import LearningRateScheduler
 
-
 class CNNSpeckleFilter:
     def __init__(self, input_shape, n_layers):
         self.model = self.__build_model(input_shape, n_layers)
