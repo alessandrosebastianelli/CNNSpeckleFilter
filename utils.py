@@ -53,6 +53,8 @@ def plot_model_results(batch_speckle, batch_clean, batch_pred, n=False):
     n = batch_speckle.shape[0]
 
     for i in range(n):
+        print('===========================================================================================================================================')
+        print('                                                                 TEST %d                                                                   ' % (i))
         fig, axes = plt.subplots(
         nrows = 2,
         ncols = 4, 
@@ -62,10 +64,10 @@ def plot_model_results(batch_speckle, batch_clean, batch_pred, n=False):
         axes[0,0].set_title('Input with speckle')
         axes[0,1].imshow(batch_clean[i,...,0], cmap='gray')#, vmin=0, vmax=1.0)
         axes[0,1].set_title('Ground truth')
-        if n:
+        if n==True:
           axes[0,2].imshow(batch_pred[i,...,0], cmap='gray', vmin=0, vmax=1.0)
         else:
-          axes[0,2].imshow(batch_pred[i,...,0], cmap='gray')#, vmin=0, vmax=1.0)
+          axes[0,2].imshow(batch_pred[i,...,0], cmap='gray', vmin = np.min(batch_pred[i,...,0]), vmax =np.max(batch_pred[i,...,0]))#, vmin=0, vmax=1.0)
         axes[0,2].set_title('Model Prediction')
         diff = np.abs(batch_pred[i,...,0] - batch_clean[i,...,0])
         axes[0,3].imshow(diff, vmin=np.min(diff), vmax=np.max(diff), cmap='gray')
@@ -99,5 +101,11 @@ def compute_metrics(batch_speckle, batch_clean, batch_pred):
         gt_vs_gt = structural_similarity(batch_clean[i, ...,0], batch_clean[i, ...,0], data_range=1.0)
         gt_vs_in  = structural_similarity(batch_clean[i, ...,0], batch_speckle[i,...,0], data_range=1.0)
         gt_vs_pred  = structural_similarity(batch_clean[i, ...,0], batch_pred[i,...,0], data_range=1.0)
-        print('   %i  \t\t  PSNR \t\t             %.2f             \t\t             %.2f      \t\t             %.2f' % (i, gt_vs_gt, gt_vs_in, gt_vs_pred))
+        print('   %i  \t\t  SSIM \t\t             %.2f             \t\t             %.2f      \t\t             %.2f' % (i, gt_vs_gt, gt_vs_in, gt_vs_pred))
+        
+        enl_gt = (np.mean(batch_clean[i, ...,0])**2)/(np.std(batch_clean[i, ...,0])**2)
+        enl_in = (np.mean(batch_speckle[i,...,0])**2)/(np.std(batch_speckle[i,...,0])**2)
+        enl_pre = (np.mean(batch_pred[i,...,0])**2)/(np.std(batch_pred[i,...,0])**2)
+        
+        print('   %i  \t\t  ENL  \t\t             %.2f             \t\t             %.2f      \t\t             %.2f' % (i, enl_gt, enl_in, enl_pre))
         print('-------------------------------------------------------------------------------------------------------------------------------------------')
