@@ -17,9 +17,9 @@ def plot_dataset(batch_speckle, batch_clean):
         axes[0,1].imshow(batch_clean[i,...,0], cmap='gray')
         axes[0,1].set_title('Ground truth')
 
-        axes[1,0].hist(batch_speckle[i,...,0].flatten(), bins=20, histtype='step')
+        axes[1,0].hist(batch_speckle[i,...,0].flatten(), bins=100, histtype='step')
         axes[1,0].set_title('Input with speckle')
-        axes[1,1].hist(batch_clean[i,...,0].flatten(), bins=20, histtype='step')
+        axes[1,1].hist(batch_clean[i,...,0].flatten(), bins=100, histtype='step')
         axes[1,1].set_title('Ground truth')
 
         plt.show()
@@ -73,13 +73,13 @@ def plot_model_results(batch_speckle, batch_clean, batch_pred, n=False):
         axes[0,3].imshow(diff, vmin=np.min(diff), vmax=np.max(diff), cmap='gray')
         axes[0,3].set_title('|Model Prediction - Ground Truth|')
 
-        axes[1,0].hist(batch_speckle[i,...,0].flatten(), bins=20, histtype='step')
+        axes[1,0].hist(batch_speckle[i,...,0].flatten(), bins=100, histtype='step')
         axes[1,0].set_title('Input with speckle')
-        axes[1,1].hist(batch_clean[i,...,0].flatten(), bins=20, histtype='step')
+        axes[1,1].hist(batch_clean[i,...,0].flatten(), bins=100, histtype='step')
         axes[1,1].set_title('Ground truth')
-        axes[1,2].hist(batch_pred[i,...,0].flatten(), bins=20, histtype='step')
+        axes[1,2].hist(batch_pred[i,...,0].flatten(), bins=100, histtype='step')
         axes[1,2].set_title('Model Prediction')
-        axes[1,3].hist(diff.flatten(), bins=20, histtype='step')
+        axes[1,3].hist(diff.flatten(), bins=100, histtype='step')
         axes[1,3].set_title('|Model Prediction - Ground Truth|')
     
         plt.show()
