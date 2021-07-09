@@ -49,7 +49,7 @@ def plot_history(history):
     ax[1].grid()
     plt.show()
 
-def plot_model_results(batch_speckle, batch_clean, batch_pred):
+def plot_model_results(batch_speckle, batch_clean, batch_pred, n=False):
     n = batch_speckle.shape[0]
 
     for i in range(n):
@@ -60,9 +60,12 @@ def plot_model_results(batch_speckle, batch_clean, batch_pred):
 
         axes[0,0].imshow(batch_speckle[i,...,0], cmap='gray')
         axes[0,0].set_title('Input with speckle')
-        axes[0,1].imshow(batch_clean[i,...,0], cmap='gray')
+        axes[0,1].imshow(batch_clean[i,...,0], cmap='gray')#, vmin=0, vmax=1.0)
         axes[0,1].set_title('Ground truth')
-        axes[0,2].imshow(batch_pred[i,...,0], cmap='gray')
+        if n:
+          axes[0,2].imshow(batch_pred[i,...,0], cmap='gray', vmin=0, vmax=1.0)
+        else:
+          axes[0,2].imshow(batch_pred[i,...,0], cmap='gray')#, vmin=0, vmax=1.0)
         axes[0,2].set_title('Model Prediction')
         diff = np.abs(batch_pred[i,...,0] - batch_clean[i,...,0])
         axes[0,3].imshow(diff, vmin=np.min(diff), vmax=np.max(diff), cmap='gray')

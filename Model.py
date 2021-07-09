@@ -1,16 +1,30 @@
-from tensorflow.keras.layers import Input, Conv2D, Activation, BatchNormalization, Subtract, MaxPooling2D, UpSampling2D
+from tensorflow.keras.layers import Input, Conv2D, concatenate, Activation, Dropout, BatchNormalization, Subtract, MaxPooling2D, UpSampling2D
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
 from tensorflow.keras.callbacks import LearningRateScheduler
+from tensorflow.keras import backend as K
+import tensorflow as tf
 
 class CNNSpeckleFilter:
+
+
+
     def __init__(self, input_shape, n_layers):
         self.model = self.__build_model(input_shape, n_layers)
 
-        self.optimizer = Adam(lr=0.0002)
+        def custom_loss(y_true, y_pred):
+          return 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
+
+        self.optimizer = Adam(learning_rate=0.0002, 
+                              beta_1=0.9, 
+                              beta_2=0.999, 
+                              epsilon=None, 
+                              decay=0.0, 
+                              amsgrad=False)
+
         self.model.compile(
-            loss = 'mse', 
+            loss = 'mse', #'binary_crossentropy',#custom_loss, 
             optimizer = self.optimizer, 
             metrics = ['mae'])
 
@@ -21,14 +35,14 @@ class CNNSpeckleFilter:
 
         # Input layer
         x_input = Input(shape = input_shape)
-        x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same')(x_input)
+        x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(x_input)
         x = Activation('relu')(x)
         # Repeated layers
         
         for i in range(n_layers):
-            x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same')(x)
+            x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(x)
             #x = MaxPooling2D((2,2), padding='same')(x)
-            #x = BatchNormalization()(x)
+            x = BatchNormalization()(x)
             x = Activation('relu')(x)
 
         #for i in range((n_layers//2)):
@@ -38,7 +52,7 @@ class CNNSpeckleFilter:
         #    x = UpSampling2D((2,2))(x)
 
         # Conversion layer
-        x = Conv2D(filters = 1, kernel_size = kernel_size, strides = stride, padding = 'same')(x)
+        x = Conv2D(filters = 1, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(x)
         x = Activation('relu')(x)
     
         skip = Subtract()([x_input,x])
@@ -68,7 +82,7 @@ class CNNSpeckleFilter:
             validation_data=val_gen,
             validation_steps=val_step,
             epochs = epochs,
-            callbacks=callbacks
+            #callbacks=callbacks
         )
 
         return history
