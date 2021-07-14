@@ -31,7 +31,7 @@ class DatasetHandler():
             intensity = np.transpose(intensity)
         return intensity.astype(np.float)
     
-    def __normalize(self, s1, MAX, MIN):
+    def normalize(self, s1, MAX, MIN):
         def reject_outliers_2(data, m=5):
             d = np.abs(data - np.median(data))
             mdev = np.median(d)
@@ -39,9 +39,7 @@ class DatasetHandler():
             return data[s < m]  
 
         d = reject_outliers_2(s1.flatten(), m=5.)
-     
         s1_n = (s1 -  np.min(d))/(np.max(d) -  np.min(d))
-
         s1_n = np.clip(s1_n, 0.0, 1.0)
 
         return s1_n.astype(np.float)
@@ -76,14 +74,14 @@ class DatasetHandler():
                 s1 = s1[0:img_shape[0], 0:img_shape[1],:]
                 #s1 = self.__normalize(s1)
 
-                batch_clean[i,0:img_shape[0], 0:img_shape[1], :] = self.__normalize(s1, MAX, MIN)
+                batch_clean[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(s1, MAX, MIN)
 
                 if out_noise:
                   batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], batch_noise[i,0:img_shape[0], 0:img_shape[1], :] = self.__add_speckle(s1)
                 else:  
                   batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], _ = self.__add_speckle(s1)
 
-                batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = self.__normalize(batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], MAX, MIN)
+                batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], MAX, MIN)
                 counter += 1
             if out_noise:
               yield batch_speckle, batch_clean, batch_noise
@@ -102,11 +100,11 @@ class DatasetHandler():
             s1 = s1[0:img_shape[0], 0:img_shape[1],:]
             #s1 = self.__normalize(s1)
 
-            batch_clean[i,0:img_shape[0], 0:img_shape[1], :] = self.__normalize(s1, MAX, MIN) 
+            batch_clean[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(s1, MAX, MIN) 
             batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], _ = self.__add_speckle(s1)
 
             #batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = batch_speckle[i,0:img_shape[0], 0:img_shape[1], :]
-            batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = self.__normalize(batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], MAX, MIN)
+            batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], MAX, MIN)
          
         return batch_speckle, batch_clean
 
