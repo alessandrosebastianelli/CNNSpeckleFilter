@@ -8,6 +8,7 @@ import numpy as np
 from findpeaks import findpeaks
 import findpeaks
 import bm3d
+from scipy import special
 
 def preprocessing_int2net(img):
     return img.abs().log()/2
@@ -112,7 +113,7 @@ def test_SARCNN(img):
         #noise_int  = torch.from_numpy(noise_int.astype(np.float32))[None, None, :, :]
 
         noisy_int  = torch.from_numpy(((1/256.0)+img[0:64, 0:64, 0]).astype(np.float32))[None, None, :, :]
-        #noisy_int = preprocessing_int2net(noisy_int)
+        noisy_int = preprocessing_int2net(noisy_int)
         pred_int = sarcnn(noisy_int)
 
         #pred_int = postprocessing_net2int(pred_int)
@@ -158,8 +159,6 @@ def test_speckle2void(img):
     sys.path.append('speckle2void/libraries')
     #sys.path.insert(0, './libraries')
 
-    img2 = np.zeros((1, img.shape[0], img.shape[1],1))
-    img2[0,...] = img
 
     import tensorflow.compat.v1 as tf
     tf.disable_v2_behavior()
@@ -183,13 +182,13 @@ def test_speckle2void(img):
                     k_penalty_tv=5e-05,
                     shift_list=[3,1],
                     prob = [0.9,0.1],
-                    clip=1,
-                    norm=1,
+                    clip=500000,
+                    norm=100000,
                     L_noise=1)   
 
     model.build_inference()
     model.load_weights()
-    batch_pred = model.predict(img2)
+    batch_pred = model.predict(img)
 
     sys.path.remove('speckle2void')
     sys.path.remove('speckle2void/libraries')
@@ -204,18 +203,32 @@ def test_SAR2SAR(img):
     from model import denoiser
     tf.reset_default_graph()
 
-    img2 = np.zeros((1, img.shape[0], img.shape[1],1))
-    img2[0,...] = img
 
+    # DEFINE PARAMETERS OF SPECKLE AND NORMALIZATION FACTOR
+    M = 10.089038980848645
+    m = -1.429329123112601
+    L = 1
+    c = (1 / 2) * (special.psi(L) - np.log(L))
+    cn = c / (M - m)  # normalized (0,1) mean of log speckle
+
+    def normalize_sar(im):
+        return ((np.log(im + np.spacing(1)) - m) * 255 / (M - m)).astype('float32')
+
+    img = normalize_sar(img)/255.0
 
     with tf.Session() as sess:
         model = denoiser(sess)
         model.load('SAR2SAR-GRD-test/checkpoint')
         Y_ = tf.placeholder(tf.float32, [None, None, None, 1],
                                  name='clean_image')
-        pred = sess.run([model.Y], feed_dict={model.Y_: img2})
+        pred = sess.run([model.Y], feed_dict={model.Y_: img})
 
     sys.path.remove('SAR2SAR-GRD-test')
+
+    def denormalize_sar(im):
+        return np.exp((M - m) * (np.squeeze(im)).astype('float32') + m)
+
+    
 
     return pred[0][0,...]
 
