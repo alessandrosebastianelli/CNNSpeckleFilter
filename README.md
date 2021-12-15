@@ -9,6 +9,9 @@ A speckle filter for Synthetic Aperture Radar data based on Convolutional Neural
 
 #### Download the dataset from [here](https://github.com/Sebbyraft/sentinel_1_GRD_dataset/archive/refs/heads/main.zip) ([repository](https://github.com/Sebbyraft/sentinel_1_GRD_dataset))
 
+
+The test images presented in our paper are too large for git-hub, if you are interested please send a request to sebastianelli@unisannio.it. 
+
 ## Installation
 This project has been developed in Python3.6.8.
 
