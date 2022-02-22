@@ -25,26 +25,23 @@ class DatasetHandler():
             ), "*")
         )
 
-    def __load(self, path):
+    def load(self, path):
         with rasterio.open(path) as src:
             intensity = src.read()
-            intensity = np.transpose(intensity)
-        return intensity.astype(np.float)
+            intensity = np.moveaxis(intensity,0,-1)
+
+        return intensity
     
-    def normalize(self, s1, MAX, MIN):
-        def reject_outliers_2(data, m=5):
-            d = np.abs(data - np.median(data))
-            mdev = np.median(d)
-            s = d / (mdev if mdev else 1.)
-            return data[s < m]  
+    def reject_outliers(self, s1):
+        p = np.percentile(s1, 90)
+        s1 = np.clip(s1, 0.0, p)
 
-        d = reject_outliers_2(s1.flatten(), m=5.)
-        s1_n = (s1 -  np.min(d))/(np.max(d) -  np.min(d))
-        s1_n = np.clip(s1_n, 0.0, 1.0)
+        return s1.astype(np.float)
+    
+    def min_max(self, s1):
+        return (s1 - s1.min()) / (s1.max() - s1.min()).astype(np.float)
 
-        return s1_n.astype(np.float)
-
-    def __add_speckle(self, s1, looks = 4):
+    def add_speckle(self, s1, looks = 4):
         # Numpy Gamma Distribution is defined in the shape-scale form
         # Mean 1 Var 1/looks
         gamma_shape = looks
@@ -55,73 +52,45 @@ class DatasetHandler():
                                 s1.shape[0]*s1.shape[1]).reshape(s1.shape)
         s1 = s1*noise
 
-        return s1.astype(np.float), noise
+        return s1.astype(np.float), noise.astype(np.float)
 
-    def data_loader(self, paths, batch_size, img_shape, MAX, MIN, out_noise=False):
+    def data_loader(self, paths, batch_size, img_shape, out_noise=False):
         batch_speckle = np.zeros((batch_size, img_shape[0], img_shape[1], 1))
         batch_clean = np.zeros((batch_size, img_shape[0], img_shape[1], 1))
 
         if out_noise:
-          batch_noise = np.zeros((batch_size, img_shape[0], img_shape[1], 1))
+            batch_noise = np.zeros((batch_size, img_shape[0], img_shape[1], 1))
 
         indexes = random.sample(range(len(paths)-1), len(paths)-1)
         counter = 0
 
         while True:
             for i in range(batch_size):
+                # Load Image
                 idx = random.randint(0, len(paths) - 1)
-                s1 = self.__load(paths[idx])
+                s1 = self.load(paths[idx])
                 s1 = s1[0:img_shape[0], 0:img_shape[1],:]
-                #s1 = self.__normalize(s1)
-
-                batch_clean[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(s1, MAX, MIN)
-
+                                
+                # Adding speckle
                 if out_noise:
-                  batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], batch_noise[i,0:img_shape[0], 0:img_shape[1], :] = self.__add_speckle(s1)
+                    s1_speckle, batch_noise[i,0:img_shape[0], 0:img_shape[1], :] = self.add_speckle(s1)
                 else:  
-                  batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], _ = self.__add_speckle(s1)
+                    s1_speckle, _ = self.add_speckle(s1)
 
-                batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], MAX, MIN)
+                # Filling noisy inputs - normalized between 0-1
+                s1_speckle = self.reject_outliers(s1_speckle)
+                s1_speckle = self.min_max(s1_speckle)
+                batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = s1_speckle
+                
+                # Filling ground truths - normalized between 0-1
+                s1 = self.reject_outliers(s1)
+                s1 = self.min_max(s1)
+                batch_clean[i,0:img_shape[0], 0:img_shape[1], :] = s1
+                
                 counter += 1
+                
+                
             if out_noise:
-              yield batch_speckle, batch_clean, batch_noise
+                yield np.clip(batch_speckle,0.0,1.0), np.clip(batch_clean,0.0,1.0), batch_noise
             else:
-              yield batch_speckle, batch_clean
-
-    def data_loader_v2(self, paths, img_shape, MAX, MIN):
-        batch_size = len(paths)
-        batch_speckle = np.zeros((batch_size, img_shape[0], img_shape[1], 1))
-        batch_clean = np.zeros((batch_size, img_shape[0], img_shape[1], 1))
-
-        for i in range(batch_size):
-            s1 = self.__load(paths[i])
-            #s1 = self.__load(paths[indexes[i+counter]])
-            #s1 = self.__normalize(s1)
-            s1 = s1[0:img_shape[0], 0:img_shape[1],:]
-            #s1 = self.__normalize(s1)
-
-            batch_clean[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(s1, MAX, MIN) 
-            batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], _ = self.__add_speckle(s1)
-
-            #batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = batch_speckle[i,0:img_shape[0], 0:img_shape[1], :]
-            batch_speckle[i,0:img_shape[0], 0:img_shape[1], :] = self.normalize(batch_speckle[i,0:img_shape[0], 0:img_shape[1], :], MAX, MIN)
-         
-        return batch_speckle, batch_clean
-
-    def getstats(self, paths):
-        batch_size = len(paths)
-
-        maxs = []
-        mins = []
-
-        for i in range(batch_size):
-            s1 = self.__load(paths[i])
-            maxs.append(np.max(s1))
-            mins.append(np.min(s1))
-
-            print('\r Image ' + str(i) + ' of ' + str(batch_size), end='\t')
-
-        maxs = np.array(maxs)
-        mins = np.array(mins)
-
-        return np.nanmax(maxs), np.nanmin(mins)
+                yield np.clip(batch_speckle,0.0,1.0), np.clip(batch_clean,0.0,1.0)

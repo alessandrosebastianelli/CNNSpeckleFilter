@@ -6,27 +6,29 @@ from tensorflow.keras.callbacks import LearningRateScheduler
 from tensorflow.keras import backend as K
 import tensorflow as tf
 
+
 class CNNSpeckleFilter:
-
-
-
     def __init__(self, input_shape, n_layers):
         self.model = self.__build_model(input_shape, n_layers)
 
         def custom_loss(y_true, y_pred):
-          return 1 - tf.reduce_mean(tf.image.ssim(y_true, y_pred, 1.0))
+            ssim = 1-tf.reduce_mean(tf.image.ssim(y_true, y_pred, 2.0))
+            mse = K.mean(K.square(y_pred - y_true), axis=-1)
+            tv = tf.reduce_mean(tf.image.total_variation(y_pred))
+            
+            return ssim + mse + 0.00001*tv
 
-        self.optimizer = Adam(learning_rate=0.0002, 
-                              beta_1=0.9, 
-                              beta_2=0.999, 
-                              epsilon=None, 
-                              decay=0.0, 
-                              amsgrad=False)
+        self.optimizer = Adam(learning_rate=0.002)#, 
+                              #beta_1=0.9, 
+                              #beta_2=0.999, 
+                              #epsilon=None, 
+                              #decay=0.0, 
+                              #amsgrad=False)
 
         self.model.compile(
-            loss = 'mse', #'binary_crossentropy',#custom_loss, 
+            loss =  custom_loss, #'binary_crossentropy',#custom_loss, 
             optimizer = self.optimizer, 
-            metrics = ['mae'])
+            metrics = ['mse', 'mae'])
 
     def __build_model(self, input_shape, n_layers):
         n_filter = 64
@@ -45,35 +47,30 @@ class CNNSpeckleFilter:
             x = BatchNormalization()(x)
             x = Activation('relu')(x)
 
-        #for i in range((n_layers//2)):
-        #    x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same')(x)
-        #    x = BatchNormalization()(x)
-        #    x = Activation('relu')(x)
-        #    x = UpSampling2D((2,2))(x)
-
         # Conversion layer
         x = Conv2D(filters = 1, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(x)
-        x = Activation('relu')(x)
+        x = Activation('tanh')(x)
     
         skip = Subtract()([x_input,x])
 
+        #x = Conv2D(filters = 1, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(skip)
         x_output = Activation('sigmoid')(skip)
         
         model = Model(inputs = x_input, outputs = x_output, name = 'CNNSpeckleFilter')
-        
         return model
-    
+
     def train_model(self, epochs, train_gen, val_gen, train_step, val_step):
-        #es = EarlyStopping(monitor='val_loss', min_delta=0, patience=30, verbose=0, mode='auto', baseline=None, restore_best_weights=True)
+        es = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, verbose=0, mode='auto', baseline=None, restore_best_weights=False)
         def lr_scheduler(epoch, lr):
-          decay_rate = 0.85
-          decay_step = 3
-          if epoch % decay_step == 0 and epoch:
-              return lr * decay_rate
-          return lr
+            decay_rate = 0.6
+            decay_step = 3
+            if epoch % decay_step == 0 and epoch:
+                return lr * decay_rate
+            return lr
 
         callbacks = [
-          LearningRateScheduler(lr_scheduler, verbose=1)
+          LearningRateScheduler(lr_scheduler, verbose=3),
+          es
         ]
 
         history = self.model.fit(
@@ -82,7 +79,7 @@ class CNNSpeckleFilter:
             validation_data=val_gen,
             validation_steps=val_step,
             epochs = epochs,
-            #callbacks=callbacks
+            callbacks=callbacks
         )
 
         return history
