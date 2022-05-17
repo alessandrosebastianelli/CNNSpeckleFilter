@@ -32,8 +32,8 @@ class DatasetHandler():
 
         return intensity
     
-    def reject_outliers(self, s1):
-        p = np.percentile(s1, 90)
+    def reject_outliers(self, s1, perc = 95):
+        p = np.percentile(s1, perc)
         s1 = np.clip(s1, 0.0, p)
 
         return s1.astype(np.float)
@@ -49,7 +49,7 @@ class DatasetHandler():
 
         noise = np.random.gamma(gamma_shape, 
                                 gamma_scale, 
-                                s1.shape[0]*s1.shape[1]).reshape(s1.shape)
+                                (s1.shape[0],s1.shape[1]))
         s1 = s1*noise
 
         return s1.astype(np.float), noise.astype(np.float)

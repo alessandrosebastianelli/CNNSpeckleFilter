@@ -18,7 +18,7 @@ class CNNSpeckleFilter:
             
             return ssim + mse + 0.00001*tv
 
-        self.optimizer = Adam(learning_rate=0.002)#, 
+        self.optimizer = Adam(learning_rate=0.0002)#, 
                               #beta_1=0.9, 
                               #beta_2=0.999, 
                               #epsilon=None, 
@@ -37,19 +37,18 @@ class CNNSpeckleFilter:
 
         # Input layer
         x_input = Input(shape = input_shape)
-        x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(x_input)
+        x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same')(x_input)
         x = Activation('relu')(x)
         # Repeated layers
         
         for i in range(n_layers):
-            x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(x)
+            x = Conv2D(filters = n_filter, kernel_size = kernel_size, strides = stride, padding = 'same')(x)
             #x = MaxPooling2D((2,2), padding='same')(x)
             x = BatchNormalization()(x)
             x = Activation('relu')(x)
 
         # Conversion layer
-        x = Conv2D(filters = 1, kernel_size = kernel_size, strides = stride, padding = 'same', use_bias=True)(x)
-        x = Activation('tanh')(x)
+        x = Conv2D(filters = 1, kernel_size = kernel_size, strides = stride, padding = 'same')(x)
     
         skip = Subtract()([x_input,x])
 
@@ -69,7 +68,7 @@ class CNNSpeckleFilter:
             return lr
 
         callbacks = [
-          LearningRateScheduler(lr_scheduler, verbose=3),
+          #LearningRateScheduler(lr_scheduler, verbose=3),
           es
         ]
 
