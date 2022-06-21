@@ -8,12 +8,16 @@ Our residual model based on a convolutional neural network is able to remove spe
 ## Results
 
 ### **Filtering results**
+
 ![](res/t1.png)
+
 Qualitative results on the testing dataset: (a) Ground Truth, (b) Input with speckle, (c) Proposed Model Prediction, (d)
 Lee , (e) Lee Enhanced, (f) Kuan, (g) Frost, (h) Mean, (i) Median, (j) Fastnl, (k) Bilateral, (l) SAR-BM3D
 
 ### **Edges preservation**
+
 ![](res/edge1.png)
+
 Top row: Input Image without speckle, edges derived
 through the Sobel operator. Bottom row: edges of model
 prediction made on the speckled version of the input image,
@@ -21,7 +25,9 @@ and the histogram of the differences between edges in the two
 cases
 
 ### **Statistical characteristics preservation**
+
 ![](res/stat3.png)
+
 The figure shows the comparison between the histogram of
 the filtered image against the histogram of the ground truth.
 The same pdf is reported for both, and it has been calculated
