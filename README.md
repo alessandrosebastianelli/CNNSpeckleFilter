@@ -1,45 +1,64 @@
-![](res/model-v2.png)
-# CNNSpeckleFilter
-A speckle filter for Synthetic Aperture Radar data based on Convolutional Neural Networks
+# A speckle filter for Sentinel-1 SAR Ground Range Detected data based on Residual Convolutional Neural Networks
+**Authors: Alessandro Sebastianelli, Maria Pia Del Rosso, Silvia Liberata Ullo and Paolo Gamba**: 
 
-**Authors**: 
-- [Alessandro Sebastianelli](https://sebbyraft.github.io): sebastianelli@unisannio.it
-- Maria Pia Del Rosso: mariapia.delrosso@gmail.com
-- Paolo Gamba: paolo.gamba@unipv.it
-- Silvia Liberata Ullo: ullo@unisannio.it
+Our residual model based on a convolutional neural network is able to remove speckle noise from GRD Sentinel-1 data.
 
-#### Download the dataset from [here](https://github.com/Sebbyraft/sentinel_1_GRD_dataset/archive/refs/heads/main.zip) ([repository](https://github.com/Sebbyraft/sentinel_1_GRD_dataset))
+![](res/model.png)
 
+## Results
 
-The test images presented in our paper are too large for git-hub, if you are interested please send a request to sebastianelli@unisannio.it. 
+### **Filtering results**
+![](res/t1.png)
+Qualitative results on the testing dataset: (a) Ground Truth, (b) Input with speckle, (c) Proposed Model Prediction, (d)
+Lee , (e) Lee Enhanced, (f) Kuan, (g) Frost, (h) Mean, (i) Median, (j) Fastnl, (k) Bilateral, (l) SAR-BM3D
 
-## Installation
-This project has been developed in Python3.6.8.
+### **Edges preservation**
+![](res/edge1.png)
+Top row: Input Image without speckle, edges derived
+through the Sobel operator. Bottom row: edges of model
+prediction made on the speckled version of the input image,
+and the histogram of the differences between edges in the two
+cases
 
-1. <a href="https://www.python.org/downloads/release/python-368/" target="_blank">Download python 3.6.8</a>
-2. <a href="https://pip.pypa.io/en/stable/installing/" target="_blank">Install PIP</a>
-3. Install virtualenv: `pip3 install virtualenv`
-4. Navigate to Desktop
-5. Clone this project
-    - A) `git clone https://github.com/Sebbyraft/CNNSpeckleFilter.git`
-    - B) <a href="https://github.com/Sebbyraft/CNNSpeckleFilter/archive/refs/heads/main.zip" target="_blank">Download the project</a> and unzip it on Desktop
-6. Navigate into *Desktop/CNNSpeckleFilter*
-7. Create a virtual environment: `virtualenv env`
-8. Activate the virtualenv *env*:
-    - Windows: `env\Scripts\activate`
-    - MacOS\Linux: `source env/bin/activate`
-9. Install requirements: `pip install -r requirements.txt`
-9. Dataset:
-    - A) Download the dataset from [here](https://github.com/Sebbyraft/sentinel_1_GRD_dataset/archive/refs/heads/main.zip) ([repository](https://github.com/Sebbyraft/sentinel_1_GRD_dataset)) and unzip dataset.zip in the same directory
-    - B) Create your dataset using our tool [Sentinel Data Downloader Tool](https://github.com/Sebbyraft/SentinelDataDownloaderTool)
-10. Open Jupyter Lab: `jupyter lab`
+### **Statistical characteristics preservation**
+![](res/stat3.png)
+The figure shows the comparison between the histogram of
+the filtered image against the histogram of the ground truth.
+The same pdf is reported for both, and it has been calculated
+by fitting the ground truth data with a Gamma distribution as
+specified in 
 
 
-## Citation
-    @inproceedings{article_id,
-        title={SAR speckle filtering through Convolutional Neural Network},
-        author={Sebastianelli, A. and Del Rosso, M. P. and Ullo, S. L.},
-        booktitle={},
+## Dataset
+
+The dataset is realeased in two versions:
+
+- **dataset**: Sentinel-1 GRD 256x256 products randomly acquired on the Earth surface (averaged amplitudes)
+- **dataset_v2**: Sentinel-1 GRD 256x256 products randomly acquired on the Earth surface (averaged intensities)
+
+[Direct Download](https://github.com/Sebbyraft/sentinel_1_GRD_dataset/archive/refs/heads/main.zip)
+
+[Dataset Repository](https://github.com/Sebbyraft/sentinel_1_GRD_dataset)
+
+## Cite our papers
+
+The dataset has been implemented with:
+
+    @article{sebastianelli2021automatic,
+        title={Automatic dataset builder for Machine Learning applications to satellite imagery},
+        author={Sebastianelli, Alessandro and Del Rosso, Maria Pia and Ullo, Silvia Liberata},
+        journal={SoftwareX},
+        volume={15},
+        pages={100739},
         year={2021},
-        organization={}
+        publisher={Elsevier}
+    }
+
+The speckle filter is presented in:
+
+    @article{sebastianelli2022speckle,
+        author = {Sebastianelli, Alessandro and Del Rosso, Maria Pia and Ullo, Silvia Liberata and Gamba, Paolo},
+        journal = {Accepted for publication in IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing (JSTARS)},
+        title = {A speckle filter for SAR Sentinel-1 GRD data based on Residual Convolutional Neural Networks},
+        year = {2022}
     }
